@@ -1,11 +1,21 @@
 package com.kiran.retrofitstarterbatch26.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import com.kiran.retrofitstarterbatch26.R
+import com.kiran.retrofitstarterbatch26.ui.api.UserRepository
 import com.kiran.retrofitstarterbatch26.ui.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var etFname: EditText
@@ -40,9 +50,34 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             } else {
                 // retrofit model
-                val user =User(fname = fname, lname = lname, username = username, password = password)
-
-                //To to be replace with retrofit + coroutine for register functionality
+                val user =
+                    User(fname = fname, lname = lname, username = username, password = password)
+                CoroutineScope(IO).launch {
+                    try {
+                        val userRepository = UserRepository()
+                        val response = userRepository.registerUser(user)
+                        if (response.success == true) {
+                            withContext(Main) {
+                                Toast.makeText(
+                                    this@RegisterActivity,
+                                    "Successfully Registered",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                startActivity(
+                                    Intent(
+                                        this@RegisterActivity,
+                                        LoginActivity::class.java
+                                    )
+                                )
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        withContext(Main) {
+                            Toast.makeText(this@RegisterActivity, "Error $ex", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
                 print(user)
 
             }

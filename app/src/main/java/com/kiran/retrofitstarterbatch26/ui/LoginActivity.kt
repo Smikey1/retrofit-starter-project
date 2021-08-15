@@ -6,7 +6,13 @@ import android.os.Bundle
 import android.widget.*
 import com.google.android.material.textfield.TextInputEditText
 import com.kiran.retrofitstarterbatch26.R
+import com.kiran.retrofitstarterbatch26.ui.api.UserRepository
 import com.kiran.retrofitstarterbatch26.ui.model.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
 
@@ -42,7 +48,24 @@ class LoginActivity : AppCompatActivity() {
         // from retrofit-model
         val user = User(username = username, password = password)
 
-        // to be replace with retrofit + coroutine for login functionality
+        CoroutineScope(IO).launch {
+            try {
+                var userRepository = UserRepository()
+                var response = userRepository.loginUser(user)
+                if (response.success==true){
+                    withContext(Dispatchers.Main){
+                        Toast.makeText(this@LoginActivity, "Successfully Login", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@LoginActivity,FetchStudentActivity::class.java))
+                    }
+                } else {
+                    withContext(Dispatchers.Main){
+                        Toast.makeText(this@LoginActivity, "Invalid username or password", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (ex:Exception){
+                print(ex)
+            }
+        }
         print(user)
     }
 }

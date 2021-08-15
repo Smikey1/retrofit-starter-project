@@ -1,5 +1,6 @@
 package com.kiran.retrofitstarterbatch26.ui.fragment
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -66,6 +67,7 @@ class HomeFragment : Fragment() {
         notificationManager?.notify(notificationId,notification )
     }
 
+    @SuppressLint("NewApi")
     private fun createNotificationChannel(id: String, name: String, channelDescription: String) {
         val importanceLevel = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel(id, name, importanceLevel).apply {
